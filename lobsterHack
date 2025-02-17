@@ -1,10 +1,11 @@
-﻿local UserInputService = game:GetService("UserInputService")
+local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local flying = false
 local anchor = false
 local sp = false
+local hl = false
 local flySpeed = 50
 local storSP
 local storJP
@@ -36,7 +37,7 @@ titleLabel.Parent = adminFrame
 
 -- Create a sample button
 local sampleButton = Instance.new("TextButton")
-sampleButton.Size = UDim2.new(0.8, 0, 0, 50)
+sampleButton.Size = UDim2.new(0.6, 0, 0, 50)
 sampleButton.Position = UDim2.new(0.1, 0, 0, 60)
 sampleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 sampleButton.Text = "Fly"
@@ -61,6 +62,34 @@ sampleButton3.Text = "Speed"
 sampleButton3.TextScaled = true
 sampleButton3.TextColor3 = Color3.fromRGB(255, 255, 255)
 sampleButton3.Parent = adminFrame
+
+local sampleButton4 = Instance.new("TextButton")
+sampleButton4.Size = UDim2.new(0.8, 0, 0, 50)
+sampleButton4.Position = UDim2.new(0.1, 0, 0, 240)
+sampleButton4.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+sampleButton4.Text = "Highlight"
+sampleButton4.TextScaled = true
+sampleButton4.TextColor3 = Color3.fromRGB(255, 255, 255)
+sampleButton4.Parent = adminFrame
+
+local quit = Instance.new("TextButton")
+quit.Size = UDim2.new(0, 20, 0, 20)
+quit.Position = UDim2.new(1, 5, 0, -10)
+quit.BackgroundColor3 = Color3.fromRGB(198, 0, 3)
+quit.Text = "X"
+quit.TextScaled = true
+quit.TextColor3 = Color3.fromRGB(255, 255, 255)
+quit.Parent = adminFrame
+
+local TB = Instance.new("TextBox")
+TB.Size = UDim2.new(0.2, 0, 0, 50)
+TB.Position = UDim2.new(0.75, 0, 0, 60)
+TB.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+TB.Text = ""
+TB.PlaceholderText = "Enter fly speed"
+TB.TextScaled = true
+TB.TextColor3 = Color3.fromRGB(255, 255, 255)
+TB.Parent = adminFrame
 
 sampleButton.Activated:Connect(function()
 	local char = LocalPlayer.Character
@@ -105,8 +134,30 @@ sampleButton3.Activated:Connect(function()
 		sampleButton3.BackgroundColor3 = Color3.new(1, 0, 0.0156863)
 	end
 end)
+sampleButton4.Activated:Connect(function()
+	local char = LocalPlayer.Character
+	hl = not hl
+	if hl then
+		for i,v in pairs(game.Players:GetPlayers()) do
+			local HL = Instance.new("Highlight")
+			HL.Parent = v.Character
+			HL.FillColor = Color3.new(0, 0.6, 1)
+		end
+		sampleButton4.BackgroundColor3 = Color3.new(0.282353, 1, 0.0627451)
+	else
+		for i,v in pairs(game.Players:GetPlayers()) do
+			local HL = v.Character:FindFirstChildOfClass("Highlight")
+			if HL then
+				HL:Destroy()
+			end
+		end
+		sampleButton4.BackgroundColor3 = Color3.new(1, 0, 0.0156863)
+	end
+end)
 game:GetService("RunService").RenderStepped:Connect(function()
+	game:GetService("Players").LocalPlayer.CameraMode = Enum.CameraMode.Classic
 	if flying then
+		LocalPlayer.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BodyVelocity").Velocity = Vector3.new(0, 0, 0)
 		local camera = workspace.CurrentCamera
 		local direction = Vector3.new()
 
@@ -122,7 +173,21 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		if UserInputService:IsKeyDown(Enum.KeyCode.D) then
 			direction = direction + camera.CFrame.RightVector
 		end
+		if tonumber(TB.Text) then
+			LocalPlayer.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BodyVelocity").Velocity = direction * tonumber(TB.Text)
+		else
+			LocalPlayer.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BodyVelocity").Velocity = direction * flySpeed
+		end
+	end
+end)
+quit.Activated:Connect(function()
+	screenGui:Destroy()
+	script:Destroy()
+end)
 
-		LocalPlayer.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BodyVelocity").Velocity = direction * flySpeed
+UserInputService.InputBegan:Connect(function(key, gameProcessedEvent)
+	if key.KeyCode == Enum.KeyCode.C then
+		local char = LocalPlayer.Character
+		char:PivotTo(LocalPlayer:GetMouse().Hit)
 	end
 end)
