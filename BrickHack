@@ -145,23 +145,16 @@ sampleButton4.Activated:Connect(function()
 		end
 		sampleButton4.BackgroundColor3 = Color3.new(0.282353, 1, 0.0627451)
 	else
-		for i,b in pairs(v.Character) do
-			for i,v in pairs(game.Players:GetPlayers()) do
-			local HL = v.Character:FindFirstChildOfClass("Highlight")
-			if HL then
-				HL:Destroy()
-			end
-		end
-			for i,v in pairs(game.PLayers:GetPlayers()) do
-				for i,b in pairs(v.Character) do
-					if b:IsA("Highlight") then
-						b:Destroy()
-					end
+		for i,v in pairs(game.Players:GetPlayers()) do
+			for i,b in pairs(v.Character:GetChildren()) do
+				if b:IsA("Highlight")  then
+					b:Destroy()
 				end
-			end
+			end)
+		end
+	end
 		sampleButton4.BackgroundColor3 = Color3.new(1, 0, 0.0156863)
 	end
-end)
 game:GetService("RunService").RenderStepped:Connect(function()
 	game:GetService("Players").LocalPlayer.CameraMode = Enum.CameraMode.Classic
 	if flying then
